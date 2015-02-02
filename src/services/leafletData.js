@@ -11,6 +11,7 @@ angular.module("leaflet-directive").service('leafletData', function ($log, $q, l
     var geoJSON = {};
     var utfGrid = {};
     var decorations = {};
+    var mapboxGL = {};
 
     this.setMap = function(leafletMap, scopeId) {
         var defer = getUnresolvedDefer(maps, scopeId);
@@ -32,6 +33,7 @@ angular.module("leaflet-directive").service('leafletData', function ($log, $q, l
         markers[id] = undefined;
         geoJSON[id] = undefined;
         utfGrid[id] = undefined;
+        mapboxGL[id] = undefined;
         decorations[id] = undefined;
     };
 
@@ -98,6 +100,17 @@ angular.module("leaflet-directive").service('leafletData', function ($log, $q, l
 
     this.getGeoJSON = function(scopeId) {
         var defer = getDefer(geoJSON, scopeId);
+        return defer.promise;
+    };
+
+    this.setMapboxGL = function(leafletMapboxGL, scopeId) {
+        var defer = getUnresolvedDefer(mapboxGL, scopeId);
+        defer.resolve(leafletMapboxGL);
+        setResolvedDefer(mapboxGL, scopeId);
+    };
+
+    this.getMapboxGL = function(scopeId) {
+        var defer = getDefer(mapboxGL, scopeId);
         return defer.promise;
     };
 

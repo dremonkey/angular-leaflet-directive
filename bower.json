@@ -35,7 +35,9 @@
     "Leaflet.MakiMarkers": "*",
     "Leaflet.ExtraMarkers": "git://github.com/coryasilva/Leaflet.ExtraMarkers#master",
     "Leaflet.PolylineDecorator": "bbecquet/Leaflet.PolylineDecorator",
-    "ionrangeslider": "~1.9.3"
+    "ionrangeslider": "~1.9.3",
+    "mapbox-gl": "git@github.com:mapbox/mapbox-gl-js.git",
+    "leaflet-mapbox-gl": "git@github.com:mapbox/mapbox-gl-leaflet.git"
   },
   "overrides": {
     "Leaflet.utfgrid": {

@@ -14,6 +14,7 @@ module.exports = function (grunt, options) {
                 'src/directives/legend.js',
                 'src/directives/geojson.js',
                 'src/directives/layers.js',
+                'src/directives/mapboxgl.js',
                 'src/directives/bounds.js',
                 'src/directives/markers.js',
                 'src/directives/paths.js',

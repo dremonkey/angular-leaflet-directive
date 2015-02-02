@@ -354,6 +354,19 @@ angular.module("leaflet-directive").factory('leafletHelpers', function ($q, $log
 				}
 			}
         },
+        MapboxGLPlugin: {
+            isLoaded: function() {
+                return L.mapboxGL !== undefined;
+            },
+            is: function(layer) {
+                if (this.isLoaded()) {
+                    console.log('is mapboxGl layer', layer);
+                    return layer instanceof L.mapboxGL;
+                } else {
+                    return false;
+                }
+            }
+        },
         GeoJSONPlugin: {
             isLoaded: function(){
                 return angular.isDefined(L.TileLayer.GeoJSON);

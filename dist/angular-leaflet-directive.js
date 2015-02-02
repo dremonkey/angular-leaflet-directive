@@ -764,6 +764,43 @@ angular.module("leaflet-directive").directive('layers', ["$log", "$q", "leafletD
     };
 }]);
 
+angular.module('leaflet-directive').directive('mapboxgl', ["$log", "$rootScope", "leafletData", "leafletHelpers", function ($log, $rootScope, leafletData, leafletHelpers) {
+  return {
+    restrict: 'A',
+    scope: false,
+    replace: false,
+    require: 'leaflet',
+
+    link: function(scope, element, attrs, controller) {
+      var isDefined = leafletHelpers.isDefined,
+          leafletScope  = controller.getLeafletScope(),
+          leafletMapboxGL;
+
+      controller.getMap().then(function(map) {
+
+        leafletScope.$watch('mapboxgl', function(mapboxgl) {
+
+          if (!leafletHelpers.MapboxGLPlugin.isLoaded()) {
+            console.log('Leaflet Mapbox GL Plugin not found...');
+            return;
+          }
+
+          // add if it doesn't exist... 
+          // this will only allow for one mapboxgl "canvas" instance on the page should we allow more?
+          if (!isDefined(leafletMapboxGL) && !map.hasLayer(leafletMapboxGL)) {
+            
+            leafletMapboxGL = L.mapboxGL(mapboxgl);
+            leafletData.setMapboxGL(leafletMapboxGL, attrs.id);
+            leafletMapboxGL.addTo(map);
+          }
+
+          // add layers the the gl canvas
+          
+        });
+      });
+    }
+  };
+}]);
 angular.module("leaflet-directive").directive('bounds', ["$log", "$timeout", "leafletHelpers", "leafletBoundsHelpers", function ($log, $timeout, leafletHelpers, leafletBoundsHelpers) {
     return {
         restrict: "A",
@@ -1222,7 +1259,7 @@ angular.module("leaflet-directive").directive('eventBroadcast', ["$log", "$rootS
     };
 }]);
 
-angular.module("leaflet-directive").directive('maxbounds', ["$log", "leafletMapDefaults", "leafletBoundsHelpers", function ($log, leafletMapDefaults, leafletBoundsHelpers) {
+angular.module("leaflet-directive").directive('maxbounds', ["$log", "leafletMapDefaults", "leafletBoundsHelpers", "leafletHelpers", function ($log, leafletMapDefaults, leafletBoundsHelpers, leafletHelpers) {
     return {
         restrict: "A",
         scope: false,
@@ -1231,7 +1268,8 @@ angular.module("leaflet-directive").directive('maxbounds', ["$log", "leafletMapD
 
         link: function(scope, element, attrs, controller) {
             var leafletScope  = controller.getLeafletScope(),
-                isValidBounds = leafletBoundsHelpers.isValidBounds;
+                isValidBounds = leafletBoundsHelpers.isValidBounds,
+                isNumber = leafletHelpers.isNumber;
 
 
             controller.getMap().then(function(map) {
@@ -1241,14 +1279,15 @@ angular.module("leaflet-directive").directive('maxbounds', ["$log", "leafletMapD
                         map.setMaxBounds();
                         return;
                     }
-                    var bounds = [
-                        [ maxbounds.southWest.lat, maxbounds.southWest.lng ],
-                        [ maxbounds.northEast.lat, maxbounds.northEast.lng ]
-                    ];
+                    
+                    var leafletBounds = leafletBoundsHelpers.createLeafletBounds(maxbounds);
+                    if(isNumber(maxbounds.pad)) {
+                      leafletBounds = leafletBounds.pad(maxbounds.pad);
+                    }
 
-                    map.setMaxBounds(bounds);
+                    map.setMaxBounds(leafletBounds);
                     if (!attrs.center) {
-                        map.fitBounds(bounds);
+                        map.fitBounds(leafletBounds);
                     }
                 });
             });
@@ -1567,6 +1606,7 @@ angular.module("leaflet-directive").service('leafletData', ["$log", "$q", "leafl
     var geoJSON = {};
     var utfGrid = {};
     var decorations = {};
+    var mapboxGL = {};
 
     this.setMap = function(leafletMap, scopeId) {
         var defer = getUnresolvedDefer(maps, scopeId);
@@ -1588,6 +1628,7 @@ angular.module("leaflet-directive").service('leafletData', ["$log", "$q", "leafl
         markers[id] = undefined;
         geoJSON[id] = undefined;
         utfGrid[id] = undefined;
+        mapboxGL[id] = undefined;
         decorations[id] = undefined;
     };
 
@@ -1654,6 +1695,17 @@ angular.module("leaflet-directive").service('leafletData', ["$log", "$q", "leafl
 
     this.getGeoJSON = function(scopeId) {
         var defer = getDefer(geoJSON, scopeId);
+        return defer.promise;
+    };
+
+    this.setMapboxGL = function(leafletMapboxGL, scopeId) {
+        var defer = getUnresolvedDefer(mapboxGL, scopeId);
+        defer.resolve(leafletMapboxGL);
+        setResolvedDefer(mapboxGL, scopeId);
+    };
+
+    this.getMapboxGL = function(scopeId) {
+        var defer = getDefer(mapboxGL, scopeId);
         return defer.promise;
     };
 
@@ -2305,6 +2357,16 @@ angular.module("leaflet-directive").factory('leafletLayerHelpers', ["$rootScope"
                 return L.tileLayer(url, params.options);
             }
         },
+        // mapboxGL: {
+        //     mustHaveKey: true,
+        //     createLayer: function(params) {
+        //         console.log('mapboxGL params', params);
+        //         if (!Helpers.MapboxGLPlugin.isLoaded()) {
+        //             return;
+        //         }
+        //         return L.mapboxGL(params);
+        //     }
+        // },
         geoJSON: {
             mustHaveUrl: true,
             createLayer: function(params) {
@@ -3814,6 +3876,19 @@ angular.module("leaflet-directive").factory('leafletHelpers', ["$q", "$log", fun
 					return false;
 				}
 			}
+        },
+        MapboxGLPlugin: {
+            isLoaded: function() {
+                return L.mapboxGL !== undefined;
+            },
+            is: function(layer) {
+                if (this.isLoaded()) {
+                    console.log('is mapboxGl layer', layer);
+                    return layer instanceof L.mapboxGL;
+                } else {
+                    return false;
+                }
+            }
         },
         GeoJSONPlugin: {
             isLoaded: function(){

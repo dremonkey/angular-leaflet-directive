@@ -40,6 +40,16 @@ angular.module("leaflet-directive").factory('leafletLayerHelpers', function ($ro
                 return L.tileLayer(url, params.options);
             }
         },
+        // mapboxGL: {
+        //     mustHaveKey: true,
+        //     createLayer: function(params) {
+        //         console.log('mapboxGL params', params);
+        //         if (!Helpers.MapboxGLPlugin.isLoaded()) {
+        //             return;
+        //         }
+        //         return L.mapboxGL(params);
+        //     }
+        // },
         geoJSON: {
             mustHaveUrl: true,
             createLayer: function(params) {
