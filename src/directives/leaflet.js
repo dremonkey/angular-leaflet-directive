@@ -9,6 +9,7 @@ angular.module("leaflet-directive", []).directive('leaflet', function ($q, leafl
             maxbounds      : '=',
             bounds         : '=',
             markers        : '=',
+            mapboxgl       : '=',
             legend         : '=',
             geojson        : '=',
             paths          : '=',

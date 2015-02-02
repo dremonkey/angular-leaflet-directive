@@ -13,6 +13,7 @@ angular.module("leaflet-directive", []).directive('leaflet', ["$q", "leafletData
             maxbounds      : '=',
             bounds         : '=',
             markers        : '=',
+            mapboxgl       : '=',
             legend         : '=',
             geojson        : '=',
             paths          : '=',
@@ -788,7 +789,6 @@ angular.module('leaflet-directive').directive('mapboxgl', ["$log", "$rootScope",
           // add if it doesn't exist... 
           // this will only allow for one mapboxgl "canvas" instance on the page should we allow more?
           if (!isDefined(leafletMapboxGL) && !map.hasLayer(leafletMapboxGL)) {
-            
             leafletMapboxGL = L.mapboxGL(mapboxgl);
             leafletData.setMapboxGL(leafletMapboxGL, attrs.id);
             leafletMapboxGL.addTo(map);

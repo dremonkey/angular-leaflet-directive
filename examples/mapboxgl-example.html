@@ -1,0 +1,41 @@
+<html ng-app="demoapp">
+<head>
+    <title>WebGL</title>
+    <meta charset="utf-8">
+    <style>#map { width: 800px; height: 600px; }</style>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href='../bower_components/mapbox-gl/dist/mapbox-gl.css' rel='stylesheet' />
+
+    <script src="../bower_components/angular/angular.min.js"></script>
+    <script src="../bower_components/leaflet/dist/leaflet.js"></script>
+    <script src="../bower_components/mapbox-gl/dist/mapbox-gl.js"></script>
+    <script src='../bower_components/leaflet-mapbox-gl/leaflet-mapbox-gl.js'></script>
+    <script src="../dist/angular-leaflet-directive.js"></script>
+
+    <script>
+        var app = angular.module("demoapp", ['leaflet-directive']);
+        
+        
+        app.controller("DemoController", [ "$scope", function($scope) {
+            var token = "pk.eyJ1Ijoic2t5Y2F0Y2gtZGV2IiwiYSI6Ik1PVjVYNEkifQ.j2X9OOZDz7ABqUvHk4kesw";
+
+            angular.extend($scope, {
+                center: {
+                    lat: 51.505,
+                    lng: -0.09,
+                    zoom: 4
+                },
+                gl: {
+                    token: token,
+                    style: 'https://www.mapbox.com/mapbox-gl-styles/styles/bright-v4.json'
+                }
+            });
+        }]);
+    </script>
+</head>
+
+<body ng-controller="DemoController">
+    <leaflet width="640px" height="480px" center="center" mapboxgl="gl"></leaflet>
+</body>
+</html>
