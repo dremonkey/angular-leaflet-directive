@@ -8,27 +8,33 @@ angular.module('leaflet-directive').directive('mapboxgl', function ($log, $rootS
     link: function(scope, element, attrs, controller) {
       var isDefined = leafletHelpers.isDefined,
           leafletScope  = controller.getLeafletScope(),
-          leafletMapboxGL;
+          leafletMapboxGL,
+          glMap;
 
       controller.getMap().then(function(map) {
 
-        leafletScope.$watch('mapboxgl', function(mapboxgl) {
+        if (!leafletHelpers.MapboxGLPlugin.isLoaded()) {
+          console.log('Leaflet Mapbox GL Plugin not found...');
+          return;
+        }
 
-          if (!leafletHelpers.MapboxGLPlugin.isLoaded()) {
-            console.log('Leaflet Mapbox GL Plugin not found...');
-            return;
-          }
+        // add if it doesn't exist... 
+        // this will only allow for one mapboxgl "canvas" instance on the page should we allow more?
+        if (!isDefined(leafletMapboxGL) && !map.hasLayer(leafletMapboxGL)) {
+          leafletMapboxGL = L.mapboxGL(mapboxgl);
+          leafletData.setMapboxGL(leafletMapboxGL, attrs.id);
+          leafletMapboxGL.addTo(map);
+          glMap = leafletMapboxGL._glMap;
+        }
 
-          // add if it doesn't exist... 
-          // this will only allow for one mapboxgl "canvas" instance on the page should we allow more?
-          if (!isDefined(leafletMapboxGL) && !map.hasLayer(leafletMapboxGL)) {
-            leafletMapboxGL = L.mapboxGL(mapboxgl);
-            leafletData.setMapboxGL(leafletMapboxGL, attrs.id);
-            leafletMapboxGL.addTo(map);
-          }
+        leafletScope.$watch('mapboxgl.layers', function(mapboxgl) {
+          // add layers to the the gl map
+          glMap.Source.update();
+        });
 
-          // add layers the the gl canvas
-          
+        leafletScope.$watch('mapboxgl.sources', function(mapboxgl) {
+          // add layers to the the gl map
+          glMap.Source.update();
         });
       });
     }

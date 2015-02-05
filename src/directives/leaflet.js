@@ -93,8 +93,8 @@ angular.module("leaflet-directive", []).directive('leaflet', function ($q, leafl
                 map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
             }
 
-            // If no layers nor tiles defined, set the default tileLayer
-            if (!isDefined(attrs.tiles) && (!isDefined(attrs.layers))) {
+            // If no layers nor tiles nor mapboxgl defined, set the default tileLayer
+            if (!isDefined(attrs.tiles) && (!isDefined(attrs.layers)) && (!isDefined(attrs.mapboxgl))) {
                 var tileLayerObj = L.tileLayer(defaults.tileLayer, defaults.tileLayerOptions);
                 tileLayerObj.addTo(map);
                 leafletData.setTiles(tileLayerObj, attrs.id);
