@@ -30,12 +30,12 @@ angular.module('leaflet-directive').directive('mapboxgl', function ($log, $rootS
           }
         });
 
-        leafletScope.$watch('mapboxgl.layers', function(mapboxgl) {
+        leafletScope.$watch('mapboxgl.layers', function() {
           // add layers to the the gl map
           glMap.Source.update();
         });
 
-        leafletScope.$watch('mapboxgl.sources', function(mapboxgl) {
+        leafletScope.$watch('mapboxgl.sources', function() {
           // add layers to the the gl map
           glMap.Source.update();
         });

@@ -97,8 +97,8 @@ angular.module("leaflet-directive", []).directive('leaflet', ["$q", "leafletData
                 map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
             }
 
-            // If no layers nor tiles defined, set the default tileLayer
-            if (!isDefined(attrs.tiles) && (!isDefined(attrs.layers))) {
+            // If no layers nor tiles nor mapboxgl defined, set the default tileLayer
+            if (!isDefined(attrs.tiles) && (!isDefined(attrs.layers)) && (!isDefined(attrs.mapboxgl))) {
                 var tileLayerObj = L.tileLayer(defaults.tileLayer, defaults.tileLayerOptions);
                 tileLayerObj.addTo(map);
                 leafletData.setTiles(tileLayerObj, attrs.id);
@@ -775,7 +775,8 @@ angular.module('leaflet-directive').directive('mapboxgl', ["$log", "$rootScope",
     link: function(scope, element, attrs, controller) {
       var isDefined = leafletHelpers.isDefined,
           leafletScope  = controller.getLeafletScope(),
-          leafletMapboxGL;
+          leafletMapboxGL,
+          glMap;
 
       controller.getMap().then(function(map) {
 
@@ -792,10 +793,18 @@ angular.module('leaflet-directive').directive('mapboxgl', ["$log", "$rootScope",
             leafletMapboxGL = L.mapboxGL(mapboxgl);
             leafletData.setMapboxGL(leafletMapboxGL, attrs.id);
             leafletMapboxGL.addTo(map);
+            glMap = leafletMapboxGL._glMap;
           }
+        });
 
-          // add layers the the gl canvas
-          
+        leafletScope.$watch('mapboxgl.layers', function() {
+          // add layers to the the gl map
+          glMap.Source.update();
+        });
+
+        leafletScope.$watch('mapboxgl.sources', function() {
+          // add layers to the the gl map
+          glMap.Source.update();
         });
       });
     }
@@ -1875,6 +1884,10 @@ angular.module("leaflet-directive").factory('leafletMapDefaults', ["$q", "leafle
 
                 if (isDefined(userDefaults.map)) {
                     newDefaults.map = userDefaults.map;
+                }
+
+                if (isDefined(userDefaults.path)) {
+                    newDefaults.path = userDefaults.path;
                 }
             }
 
